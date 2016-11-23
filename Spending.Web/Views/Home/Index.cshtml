@@ -1,0 +1,111 @@
+﻿@using System.Globalization
+@model List<Spending.Data.DataModel.Transaction>
+@{
+    ViewBag.Title = "Home Page";
+}
+<div class="row" style="margin-top: 20px;">
+        <p>
+            <a class="btn btn-success" href="@Url.Action("Import")">Import</a>
+        </p>    
+</div>
+<div class="row" style="margin-top: 20px;">
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading text-center">صورت‌حساب</div>
+
+        <!-- Table -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="col-md-1 text-center">سند</th>
+                    <th class="col-md-1 text-center">تاریخ</th>
+                    <th class="col-md-1 text-center">روز</th>
+                    <th class="col-md-1 text-center">ساعت</th>
+                    <th class="col-md-2 text-center">شرح</th>
+                    <th class="col-md-2 text-center">ترمینال</th>
+                    <th class="col-md-1 text-center">واریز</th>
+                    <th class="col-md-1 text-center">برداشت</th>
+                    <th class="col-md-1 text-center">موجودی</th>
+                    <th class="col-md-2 text-center">دسته</th>
+                    <th class="col-md-2 text-center">توضیح</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+            {
+                    <tr>
+                        <td class="col-md-1 text-center">@item.DocumentId</td>
+                        <td class="col-md-1 text-center">@ToPersianDate(item.CreationDateTime)</td>
+                        <td class="col-md-1 text-center">@PersianDayName(item.CreationDateTime)</td>
+                        <td class="col-md-1 text-center">@item.CreationDateTime.ToString("HH:mm")</td>
+                        <td class="col-md-2 text-center">@item.Description</td>
+                        <td class="col-md-2 text-center">@item.TerminalId</td>
+                        <td class="col-md-1 text-center">@item.DepositValue</td>
+                        <td class="col-md-1 text-center">@item.WithdrawValue</td>
+                        <td class="col-md-1 text-center">@item.Balance</td>
+                        <td class="col-md-2 text-center"><a href="#" class="category" data-type="select" data-pk="@item.Id" data-url="@Url.Action("Category")" data-source="@Url.Action("Categories")" data-title="انتخاب دسته">@(item.Category == null ? string.Empty : item.Category.Title)</a></td>
+                        <td class="col-md-2 text-center"><a href="#" class="comment" data-type="text" data-pk="@item.Id" data-url="@Url.Action("Comment")" data-title="توضیح را وارد نمایید">@item.Comment</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@helper ToPersianDate(DateTime datetime)
+{
+    var persianCalendar = new PersianCalendar();
+    @String.Format("{0}/{1}/{2}", persianCalendar.GetYear(datetime).ToString("0000"), persianCalendar.GetMonth(datetime).ToString("00"), persianCalendar.GetDayOfMonth(datetime).ToString("00"));
+}
+
+@helper PersianDayName(DateTime datetime)
+{
+    string dayOfWeek;
+    switch (datetime.DayOfWeek)
+    {
+        case DayOfWeek.Sunday:
+            dayOfWeek = "یکشنبه";
+            break;
+        case DayOfWeek.Monday:
+            dayOfWeek = "دوشنبه";
+            break;
+        case DayOfWeek.Tuesday:
+            dayOfWeek = "سه‌شنبه";
+            break;
+        case DayOfWeek.Wednesday:
+            dayOfWeek = "چهارشنبه";
+            break;
+        case DayOfWeek.Thursday:
+            dayOfWeek = "پنجشنبه";
+            break;
+        case DayOfWeek.Friday:
+            dayOfWeek = "جمعه";
+            break;
+        case DayOfWeek.Saturday:
+            dayOfWeek = "شنبه";
+            break;
+        default:
+            throw new ArgumentOutOfRangeException();
+    }
+
+    @dayOfWeek
+}
+
+@section scripts
+{
+    <script type="text/javascript">
+        $.fn.editable.defaults.mode = 'inline';
+        $(document).ready(function () {
+            $('.comment').editable({
+                emptytext: 'خالی'
+            });
+        });
+
+        $(document).ready(function () {
+            $('.category').editable({
+                emptytext: 'خالی'
+            });
+        });
+
+    </script>
+}
