@@ -1,7 +1,7 @@
 ﻿@using System.Globalization
-@model List<Spending.Data.DataModel.Transaction>
+@model List<Spending.Web.Controllers.TransactionViewModel>
 @{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Transactions";
 }
 <div class="row" style="margin-top: 20px;">
         <p>
@@ -39,7 +39,8 @@
                         <td class="col-md-1 text-center">@PersianDayName(item.CreationDateTime)</td>
                         <td class="col-md-1 text-center">@item.CreationDateTime.ToString("HH:mm")</td>
                         <td class="col-md-2 text-center">@item.Description</td>
-                        <td class="col-md-2 text-center">@item.TerminalId</td>
+                        @*<td class="col-md-2 text-center">@(string.IsNullOrEmpty(item.TerminalTitle) ? item.TerminalId : item.TerminalTitle)</td>*@
+                        <td class="col-md-2 text-center"><a href="#" class="comment" data-type="text" data-pk="@item.TerminalId" data-url="@Url.Action("UpdateTerminal")" data-title="عنوان را وارد نمایید">@(string.IsNullOrEmpty(item.TerminalTitle) ? item.TerminalId : item.TerminalTitle)</a></td>
                         <td class="col-md-1 text-center">@item.DepositValue</td>
                         <td class="col-md-1 text-center">@item.WithdrawValue</td>
                         <td class="col-md-1 text-center">@item.Balance</td>

@@ -16,6 +16,7 @@ namespace Spending.Data
 
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Category> Categories { get; set; } 
+        public DbSet<Terminal> Terminals { get; set; }
 
         public static EntityContext Create()
         {

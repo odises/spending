@@ -20,36 +20,92 @@ namespace Spending.Web.Controllers
             var entityContext = new EntityContext();
             var userId = User.Identity.GetUserId();
 
-            if (!string.IsNullOrEmpty(order))
-            {
-                if (order == "terminal")
+            var result =
+                from transactions in entityContext.Transactions
+                join terminal in entityContext.Terminals on transactions.TerminalId equals terminal.SerialNumber into gj
+                where transactions.UserId == userId
+                from subterminal in gj.DefaultIfEmpty()
+                select new TransactionViewModel
                 {
-                    return View(entityContext.Transactions.Where(p => p.TerminalId != null && p.UserId == userId).OrderByDescending(p => p.TerminalId).ToList());
-                }
+                    Id = transactions.Id,
+                    TerminalId = transactions.TerminalId,
+                    Balance = transactions.Balance,
+                    Comment = transactions.Comment,
+                    CreationDateTime = transactions.CreationDateTime,
+                    DepositValue = transactions.DepositValue,
+                    Description = transactions.Description,
+                    DocumentId = transactions.DocumentId,
+                    TerminalTitle = subterminal.Title,
+                    UserId = transactions.UserId,
+                    WithdrawValue = transactions.WithdrawValue,
+                    Category = transactions.Category
+                };
+            if (order == "terminal")
+            {
+                result = result.OrderByDescending(p => p.TerminalId);
+            }
+            else
+            {
+                result = result.OrderByDescending(p => p.CreationDateTime);
             }
 
-            return View(entityContext.Transactions.Where(p => p.UserId == userId).OrderByDescending(p => p.CreationDateTime).ToList());
+            return View(result.ToList());
         }
 
+        public ActionResult Terminals()
+        {
+            var entity = new EntityContext();
 
-        public ActionResult UpdateTerminal()
+            var result = entity.Terminals.GroupBy(p => p.SerialNumber).ToList();
+
+            return View(result);
+        }
+
+        public ActionResult LoadAllTerminals()
+        {
+            ReloadTerminals();
+
+            return Content("Ok");
+        }
+
+        private static void ReloadTerminals()
         {
             var entityContext = new EntityContext();
 
-            var regex = new Regex("[0-9]{8}");
-            foreach (var transaction in entityContext.Transactions.ToList())
+            var terminals = entityContext.Transactions.GroupBy(p => p.TerminalId).ToList();
+
+            foreach (var terminal in terminals)
             {
-                var match = regex.Match(transaction.Description);
-                if (match.Success)
+                if (!string.IsNullOrEmpty(terminal.Key))
                 {
-                    var terminal = match.Value;
-                    transaction.TerminalId = terminal;
+                    if (!entityContext.Terminals.Any(p => p.SerialNumber == terminal.Key))
+                    {
+                        entityContext.Terminals.Add(new Terminal
+                        {
+                            SerialNumber = terminal.Key
+                        });
+                    }
                 }
             }
 
             entityContext.SaveChanges();
+        }
 
-            return View();
+        [HttpPost]
+        public JsonResult UpdateTerminal(string pk, string value)
+        {
+            var entityContext = new EntityContext();
+
+            var terminal = entityContext.Terminals.FirstOrDefault(p => p.SerialNumber == pk);
+
+            if (terminal != null)
+            {
+                terminal.Title = value;
+            }
+
+            entityContext.SaveChanges();
+
+            return Json("", JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult About()
@@ -98,6 +154,7 @@ namespace Spending.Web.Controllers
                 }
 
                 entityContext.SaveChanges();
+                ReloadTerminals();
 
                 return RedirectToAction("Index");
             }
@@ -112,7 +169,7 @@ namespace Spending.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult Comment(string name, string value, int pk)
+        public JsonResult Comment(string value, int pk)
         {
             var entities = new EntityContext();
             var transaction = entities.Transactions.FirstOrDefault(p => p.Id == pk);
@@ -122,7 +179,7 @@ namespace Spending.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult Category(string name, string value, int pk)
+        public JsonResult Category(string value, int pk)
         {
             var entities = new EntityContext();
             var transaction = entities.Transactions.FirstOrDefault(p => p.Id == pk);

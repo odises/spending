@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataModel\Category.cs" />
+    <Compile Include="DataModel\Terminal.cs" />
     <Compile Include="DataModel\Transaction.cs" />
     <Compile Include="EntityContext.cs" />
     <Compile Include="Migrations\201609151619517_InitialCreate.cs" />
@@ -80,6 +81,14 @@
     <Compile Include="Migrations\201610081128445_RequiredUserId.cs" />
     <Compile Include="Migrations\201610081128445_RequiredUserId.Designer.cs">
       <DependentUpon>201610081128445_RequiredUserId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709031257513_TerminalsAdded.cs" />
+    <Compile Include="Migrations\201709031257513_TerminalsAdded.Designer.cs">
+      <DependentUpon>201709031257513_TerminalsAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709031341454_TerminalModelChanged.cs" />
+    <Compile Include="Migrations\201709031341454_TerminalModelChanged.Designer.cs">
+      <DependentUpon>201709031341454_TerminalModelChanged.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -104,6 +113,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610081128445_RequiredUserId.resx">
       <DependentUpon>201610081128445_RequiredUserId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709031257513_TerminalsAdded.resx">
+      <DependentUpon>201709031257513_TerminalsAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709031341454_TerminalModelChanged.resx">
+      <DependentUpon>201709031341454_TerminalModelChanged.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

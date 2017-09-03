@@ -1,0 +1,88 @@
+﻿@using System.Globalization
+@model IList<IGrouping<string, Spending.Data.DataModel.Terminal>>
+@{
+    ViewBag.Title = "Terminals";
+}
+<div class="row" style="margin-top: 20px;">
+    <p>
+        <a class="btn btn-success" href="@Url.Action("Import")">Import</a>
+    </p>
+</div>
+<div class="row" style="margin-top: 20px;">
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading text-center">لیست ترمینال‌ها</div>
+
+        <!-- Table -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="col-md-1 text-center">سریال</th>
+                    <th class="col-md-1 text-center">تعداد</th>
+                    <th class="col-md-1 text-center">عنوان</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="col-md-1 text-center">@item.Key</td>
+                        <td class="col-md-1 text-center">@item.Count()</td>
+                        <td class="col-md-2 text-center"><a href="#" class="comment" data-type="text" data-pk="@item.Key" data-url="@Url.Action("UpdateTerminal")" data-title="عنوان را وارد نمایید.">@item.FirstOrDefault().Title</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@helper ToPersianDate(DateTime datetime)
+{
+var persianCalendar = new PersianCalendar();
+    @String.Format("{0}/{1}/{2}", persianCalendar.GetYear(datetime).ToString("0000"), persianCalendar.GetMonth(datetime).ToString("00"), persianCalendar.GetDayOfMonth(datetime).ToString("00"));
+}
+
+@helper PersianDayName(DateTime datetime)
+{
+string dayOfWeek;
+switch (datetime.DayOfWeek)
+{
+    case DayOfWeek.Sunday:
+        dayOfWeek = "یکشنبه";
+        break;
+    case DayOfWeek.Monday:
+        dayOfWeek = "دوشنبه";
+        break;
+    case DayOfWeek.Tuesday:
+        dayOfWeek = "سه‌شنبه";
+        break;
+    case DayOfWeek.Wednesday:
+        dayOfWeek = "چهارشنبه";
+        break;
+    case DayOfWeek.Thursday:
+        dayOfWeek = "پنجشنبه";
+        break;
+    case DayOfWeek.Friday:
+        dayOfWeek = "جمعه";
+        break;
+    case DayOfWeek.Saturday:
+        dayOfWeek = "شنبه";
+        break;
+    default:
+        throw new ArgumentOutOfRangeException();
+}
+
+    @dayOfWeek
+}
+
+@section scripts
+{
+    <script type="text/javascript">
+        $.fn.editable.defaults.mode = 'inline';
+        $(document).ready(function () {
+            $('.comment').editable({
+                emptytext: 'خالی'
+            });
+        });
+    </script>
+}
