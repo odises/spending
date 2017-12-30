@@ -20,7 +20,7 @@ namespace Spending.Web.Controllers
             var entityContext = new EntityContext();
             var userId = User.Identity.GetUserId();
 
-            var result =
+            var query =
                 from transactions in entityContext.Transactions
                 join terminal in entityContext.Terminals on transactions.TerminalId equals terminal.SerialNumber into gj
                 where transactions.UserId == userId
@@ -40,13 +40,35 @@ namespace Spending.Web.Controllers
                     WithdrawValue = transactions.WithdrawValue,
                     Category = transactions.Category
                 };
+
             if (order == "terminal")
             {
-                result = result.OrderByDescending(p => p.TerminalId);
+                query = query.OrderByDescending(p => p.TerminalId);
             }
             else
             {
-                result = result.OrderByDescending(p => p.CreationDateTime);
+                query = query.OrderByDescending(p => p.CreationDateTime);
+            }
+
+
+            var result = query.ToList();
+
+
+            foreach (var transactionViewModel in result)
+            {
+                var card = Regex.Match(transactionViewModel.Description, "[0-9]{16}");
+                if (card.Success)
+                {
+                    transactionViewModel.CardNumber = card.Value;
+                    if (transactionViewModel.Description.Contains("به ک"))
+                    {
+                        transactionViewModel.IsTransfer = true;
+                    }
+                    else
+                    {
+                        transactionViewModel.IsTransfer = false;
+                    }
+                }
             }
 
             return View(result.ToList());

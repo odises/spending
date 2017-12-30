@@ -16,6 +16,8 @@ namespace Spending.Web.Controllers
         public string Comment { get; set; }
         public string TerminalId { get; set; }
         public string TerminalTitle { get; set; }
+        public string CardNumber { get; set; }
+        public bool IsTransfer { get; set; }
         public virtual Category Category { get; set; }
     }
 }
